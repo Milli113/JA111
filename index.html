@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JA111 Budakeszi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: nyugodt, építészeti, prémium – sok levegő, finom vonalak
+   IDEA: építészeti tervlap – kék szerkesztővonalak, antracit tömbök, fehér papír
+   PICTURE: a látványterv, amelyben este felkapcsolódnak a lakások fényei
+   COLOUR & TYPE: fehér + antracit #24282C + ja111 kék #7CB6C4; Archivo széles vágás
+   LAYOUT: teljes szélességű sávok, bal oldali címek, nagy kép, adatsorok vonalzóval */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#16191c);--ink:light-dark(#24282c,#eef2f3);--mute:light-dark(#5d656c,#a6b0b6);
+--line:light-dark(#dde5e8,#2c3237);--paper:light-dark(#f3f7f8,#1d2125);
+--blue:#7cb6c4;--blueT:light-dark(#3f7f8f,#8cc5d2);--anth:#24282c;--anth2:#2e3338;--warm:#ffc27a}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Archivo",system-ui,sans-serif;font-stretch:100%;overflow-x:clip}
+img{display:block;max-width:100%}
+button,textarea,input{font-family:inherit}
+a{color:inherit}
+h1,h2,h3{font-stretch:118%;font-weight:600;line-height:1.05;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h2{font-size:clamp(32px,4.4vw,52px)}
+h3{font-size:22px;line-height:1.2}
+p{margin:0 0 1em}
+.band{padding:clamp(56px,8vw,120px) max(5vw,18px)}
+.wrap{max-width:1240px;margin:0 auto}
+.dark{background:var(--anth);color:#eef2f3;--mute:#a9b3b9;--line:#3a4046}
+.lead{font-size:clamp(17px,1.6vw,20px);color:var(--mute);max-width:62ch}
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 22px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit;font-weight:600;font-stretch:110%;text-decoration:none;cursor:pointer;transition:background .3s,color .3s,border-color .3s}
+.btn:hover{background:var(--blue);border-color:var(--blue);color:#132126}
+.btn.fill{background:var(--blue);border-color:var(--blue);color:#132126}
+.btn.fill:hover{background:#fff;border-color:#fff}
+.btn svg{transition:transform .3s}.btn:hover svg{transform:translateX(4px)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+
+/* fejléc */
+header{position:fixed;inset:0 0 auto;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px max(4vw,16px);color:#fff;transition:background .4s,color .4s,box-shadow .4s}
+header.solid{background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(12px);color:var(--ink);box-shadow:0 1px 0 var(--line)}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo svg{height:40px;width:auto}
+.logo .draw{stroke-dasharray:240;stroke-dashoffset:240;animation:draw 1.8s .2s cubic-bezier(.6,0,.2,1) forwards}
+.logo .bar{transform-box:fill-box;transform-origin:bottom;transform:scaleY(0);animation:rise .7s cubic-bezier(.3,0,.2,1) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}@keyframes rise{to{transform:none}}
+nav{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+nav a{text-decoration:none;font-size:15px;padding:10px 12px;position:relative}
+nav a::after{content:"";position:absolute;left:12px;right:12px;bottom:6px;height:1px;background:var(--blue);transform:scaleX(0);transform-origin:left;transition:transform .35s}
+nav a:hover::after{transform:none}
+@media(max-width:860px){nav a:not(.keep){display:none}}
+
+/* nyitány – görgetésre felépülő szövegek */
+.intro{position:relative;height:480svh;background:#121518;color:#fff}
+.stage{position:sticky;top:0;height:100svh;overflow:hidden}
+.media{position:absolute;inset:0;transform:scale(calc(1.1 - var(--p,0)*.1));transform-origin:60% 50%}
+.media img,.media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.8s ease}
+.media img.act,.media video{opacity:1}
+.media img.act{animation:kb 9s linear forwards}
+@keyframes kb{from{transform:scale(1.12) translate(1.5%,1%)}to{transform:scale(1) translate(0,0)}}
+.shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(14,17,20,.86) 0,rgba(14,17,20,.5) 45%,rgba(14,17,20,.08) 75%),linear-gradient(0deg,rgba(14,17,20,.85),rgba(14,17,20,0) 45%);opacity:calc(.55 + var(--p,0)*.55)}
+.mark{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:18px;transition:opacity .8s,transform 1s cubic-bezier(.6,0,.2,1);pointer-events:none}
+.mark svg{width:min(70vw,520px);height:auto;filter:drop-shadow(0 10px 30px rgba(0,0,0,.35))}
+.mark .sub{font-size:clamp(14px,1.4vw,18px);letter-spacing:.02em;color:#e3ecee;opacity:0;animation:up 1s 1.6s forwards}
+.mark .draw{animation:draw 2s .2s cubic-bezier(.6,0,.2,1) forwards}
+.mark .bar{transform-box:fill-box;transform-origin:bottom;transform:scaleY(0);animation:rise .8s cubic-bezier(.3,0,.2,1) forwards}
+.intro.go .mark{opacity:0;transform:translateY(-8vh) scale(.92)}
+.copy{position:absolute;left:max(5vw,18px);right:max(5vw,18px);bottom:clamp(70px,11vh,120px);max-width:1240px}
+.copy h1{font-size:clamp(36px,5.6vw,82px);font-weight:500;line-height:1.02;max-width:21ch}
+.copy h1 b{color:var(--blue);font-weight:700}
+.m{display:block;overflow:hidden;padding-bottom:.06em}
+.ln{display:block;transform:translateY(105%);opacity:0;transition:transform 1.1s cubic-bezier(.2,.75,.15,1),opacity .8s}
+.ln.on{transform:none;opacity:1}
+.copy p.ln{font-size:clamp(16px,1.5vw,20px);color:#d7e1e4;margin:22px 0 0;max-width:52ch}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid transparent;transition:border-color 1s;margin-top:clamp(22px,4vh,44px)}
+.stats>div{padding:16px 18px 0 0}
+.stats strong{display:block;font-size:clamp(24px,2.8vw,40px);font-stretch:118%;font-weight:600;line-height:1.1;white-space:nowrap}
+.stats span{font-size:14px;color:#c6d1d5}
+.stats>div{transform:translateY(30px);opacity:0;transition:transform .9s cubic-bezier(.2,.75,.15,1),opacity .9s}
+.stats.on>div{transform:none;opacity:1}.stats.on{border-color:rgba(255,255,255,.28)}
+.stats.on>div:nth-child(2){transition-delay:.1s}.stats.on>div:nth-child(3){transition-delay:.2s}.stats.on>div:nth-child(4){transition-delay:.3s}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.copy{bottom:84px}.ticks{display:none}}
+.cue{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:grid;justify-items:center;gap:8px;font-size:13px;color:#dfe8ea;transition:opacity .5s}
+.cue i{width:1px;height:46px;background:linear-gradient(#fff,transparent);transform-origin:top;animation:cue 1.8s infinite}
+@keyframes cue{0%{transform:scaleY(0)}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.intro.done .cue{opacity:0}
+.ticks{position:absolute;right:max(3vw,14px);top:50%;transform:translateY(-50%);display:grid;gap:14px}
+.ticks i{width:8px;height:8px;border:1px solid rgba(255,255,255,.7);border-radius:50%;transition:background .4s,transform .4s}
+.ticks i.on{background:var(--blue);border-color:var(--blue);transform:scale(1.3)}
+.pbar{position:absolute;left:0;bottom:0;height:2px;width:100%;background:rgba(255,255,255,.12)}
+.pbar i{display:block;height:100%;width:calc(var(--p,0)*100%);background:var(--blue)}
+.vplay{position:absolute;left:max(5vw,18px);top:84px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(20,24,27,.35);backdrop-filter:blur(6px);color:#fff;display:grid;place-items:center;cursor:pointer;transition:background .3s}.vplay:hover{background:var(--blue);color:#132126}
+.vidtag{position:absolute;right:max(3vw,14px);bottom:18px;font-size:12px;color:rgba(255,255,255,.6)}
+@keyframes up{to{opacity:1;transform:none}}
+
+/* érkezés */
+.arr{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.3fr);gap:clamp(28px,5vw,80px);align-items:center}
+@media(max-width:860px){.arr{grid-template-columns:1fr}}
+.frame{position:relative;overflow:hidden}
+.frame img{width:100%;height:100%;object-fit:cover;transform:scale(1.12) translateY(var(--py,0px));will-change:transform}
+.cap{position:absolute;left:14px;bottom:12px;background:rgba(36,40,44,.78);color:#fff;font-size:13px;padding:6px 10px;backdrop-filter:blur(6px)}
+
+/* jelenet (lakásválasztó) */
+.selhead{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:clamp(20px,4vw,60px);align-items:end;margin-bottom:clamp(26px,4vw,44px)}
+@media(max-width:800px){.selhead{grid-template-columns:1fr}}
+.hint{display:flex;gap:12px;align-items:center;color:var(--mute);font-size:15px}
+.bulb{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;background:rgba(255,194,122,.12);color:var(--warm);animation:pulse 2.4s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 10px rgba(255,194,122,0)}0%{box-shadow:0 0 0 0 rgba(255,194,122,.35)}}
+.scene{position:relative;aspect-ratio:1800/1013;overflow:hidden;background:#111;user-select:none}
+.scene .layer{position:absolute;inset:0}
+.scene img{position:absolute;pointer-events:none}
+.scene .day,.scene .night{inset:0;width:100%;height:100%}
+.scene .night{opacity:0;transition:opacity .7s ease}
+.scene.on .night{opacity:1}
+.scene .lit,.scene .glow{opacity:0;transition:opacity .4s}
+.scene .glow{mix-blend-mode:screen}
+.scene .lit.go{animation:flick .9s forwards}
+.scene .glow.go{animation:flick .9s .05s forwards}
+@keyframes flick{0%{opacity:0}12%{opacity:.85}18%{opacity:.15}30%{opacity:1}36%{opacity:.6}48%,100%{opacity:1}}
+.scene svg{position:absolute;inset:0;width:100%;height:100%}
+.hit{fill:transparent;stroke:transparent;cursor:pointer;transition:fill .4s,stroke .4s}
+.scene.on .hit.cur{fill:rgba(124,182,196,.06);stroke:rgba(124,182,196,.9);stroke-width:2;stroke-dasharray:6 6;animation:ants 1.2s linear infinite}
+@keyframes ants{to{stroke-dashoffset:-24}}
+.pin{position:absolute;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;border:1.5px solid #fff;background:rgba(36,40,44,.6);backdrop-filter:blur(6px);color:#fff;font:700 18px/1 "Archivo",system-ui,sans-serif;font-stretch:120%;cursor:pointer;transition:background .3s,transform .3s,color .3s}
+.pin::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:1px solid rgba(255,255,255,.55);animation:ring 2.6s infinite}
+@keyframes ring{from{transform:scale(.8);opacity:1}to{transform:scale(1.5);opacity:0}}
+.pin.cur{background:var(--warm);color:#2a1d0e;border-color:var(--warm);transform:translate(-50%,-50%) scale(1.12)}
+.scene.on .pin:not(.cur){opacity:.45}
+.tip{position:absolute;z-index:5;width:250px;padding:18px 18px 16px;background:#fff;color:#24282c;pointer-events:none;opacity:0;transform:translateY(10px);transition:opacity .3s,transform .3s;box-shadow:0 24px 50px -20px rgba(0,0,0,.6)}
+.tip.show{opacity:1;transform:none}
+.tip h3{font-size:24px}
+.tip dl{display:grid;grid-template-columns:1fr auto;margin:12px 0;font-size:14px;gap:4px 10px}
+.tip dt{color:#5d656c}.tip dd{margin:0;font-weight:600;text-align:right;white-space:nowrap}
+.tip .go{display:flex;justify-content:space-between;border-top:1px solid #dde5e8;padding-top:10px;font-weight:600;color:#3f7f8f;font-size:14px}
+@media(max-width:700px){.tip{display:none}.pin{width:38px;height:38px;font-size:15px}}
+.units{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:28px}
+@media(max-width:860px){.units{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ucard{background:var(--anth);padding:22px 20px;text-decoration:none;display:grid;gap:6px;position:relative;overflow:hidden;transition:background .4s;cursor:pointer;border:0;color:inherit;font:inherit;text-align:left}
+.ucard::before{content:"";position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--warm);transform:scaleX(0);transform-origin:left;transition:transform .5s}
+.ucard.cur,.ucard:hover{background:var(--anth2)}.ucard.cur::before,.ucard:hover::before{transform:none}
+.ucard .L{font-size:44px;font-weight:700;font-stretch:125%;line-height:1;color:transparent;-webkit-text-stroke:1.2px var(--blue)}
+.ucard.cur .L{color:var(--warm);-webkit-text-stroke:0;text-shadow:0 0 24px rgba(255,194,122,.6)}
+.ucard small{color:var(--mute);font-size:14px}
+.ucard b{font-size:20px;font-stretch:115%;white-space:nowrap}
+.ucard .arr{position:absolute;right:18px;top:22px;color:var(--blue)}
+
+/* koncepció */
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,6vw,96px)}
+@media(max-width:800px){.two{grid-template-columns:1fr}}
+.facts{display:grid;gap:0;border-top:1px solid var(--line)}
+.facts div{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:baseline;padding:20px 0;border-bottom:1px solid var(--line)}
+.facts strong{font-size:clamp(30px,3.6vw,46px);font-stretch:120%;font-weight:600;color:var(--blueT);min-width:4.2ch;white-space:nowrap}
+.section-mark{display:flex;align-items:center;gap:14px;color:var(--blueT);font-size:15px;font-weight:600;margin-bottom:18px}
+.section-mark::before{content:"";width:36px;height:1px;background:currentColor}
+
+/* műszaki */
+.spec{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:40px}
+@media(max-width:900px){.spec{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.spec{grid-template-columns:1fr}}
+.spec div{background:var(--bg);padding:26px 24px;transition:background .35s}
+.spec div:hover{background:var(--paper)}
+.spec svg{width:40px;height:40px;stroke:var(--blueT);fill:none;stroke-width:1.4;margin-bottom:16px}
+.spec h3{font-size:18px;margin-bottom:6px;font-stretch:110%}
+.spec p{color:var(--mute);font-size:15px;margin:0}
+
+/* környék */
+.map{position:relative;background:var(--paper);min-height:360px}
+.map svg{position:absolute;inset:0;width:100%;height:100%}
+.near{list-style:none;padding:0;margin:24px 0 0;display:grid;gap:0;border-top:1px solid var(--line)}
+.near li{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--line)}
+.near span{color:var(--mute);font-size:15px;text-align:right}
+
+/* kapcsolat */
+.contact{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(28px,5vw,80px);align-items:start}
+@media(max-width:800px){.contact{grid-template-columns:1fr}}
+.card{border:1px solid var(--line);padding:clamp(22px,3vw,34px)}
+.card .row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.card .row:last-child{border:0}
+.card .row span{color:var(--mute)}
+.card a{font-weight:600;text-decoration:none;overflow-wrap:anywhere}
+.card a:hover{color:var(--blue)}
+footer{padding:28px max(5vw,18px);font-size:13px;color:var(--mute);border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* aloldal: lakóegység */
+#unit{display:none}
+body.unit #home{display:none}body.unit #unit{display:block}
+.uhero{position:relative;background:#14171a;color:#fff;overflow:hidden;padding-top:72px}
+.uhero .scene{aspect-ratio:auto;height:min(78svh,720px);background:#14171a}
+.uhero .scene .layer{transition:transform 1.6s cubic-bezier(.5,0,.15,1)}
+.uhero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,23,26,.92) 0,rgba(20,23,26,.55) 38%,rgba(20,23,26,0) 70%),linear-gradient(0deg,rgba(20,23,26,.9),rgba(20,23,26,0) 35%);pointer-events:none}
+.uhero .over{position:absolute;z-index:3;left:max(5vw,18px);bottom:clamp(28px,5vw,60px);right:max(5vw,18px);display:flex;justify-content:space-between;align-items:end;gap:30px;flex-wrap:wrap}
+.bigL{font-size:clamp(120px,18vw,240px);line-height:.8;font-weight:700;font-stretch:125%;color:transparent;-webkit-text-stroke:2px var(--blue);margin:0 0 12px -6px}
+.uhero h1{font-size:clamp(32px,4.4vw,56px);font-weight:500}
+.uhero .over p{color:#cdd7da;margin:12px 0 0;max-width:46ch}
+.usw{display:flex;gap:8px}
+.usw a{width:48px;height:48px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.4);text-decoration:none;font-weight:700;font-stretch:120%;transition:all .3s}
+.usw a:hover{border-color:var(--blue);color:var(--blue)}
+.usw a.cur{background:var(--warm);border-color:var(--warm);color:#2a1d0e}
+.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid var(--line)}
+.kpi div{padding:clamp(20px,3vw,34px) max(2vw,14px);border-right:1px solid var(--line)}
+.kpi div:last-child{border:0}
+.kpi strong{display:block;font-size:clamp(26px,3.2vw,42px);font-stretch:118%;font-weight:600;white-space:nowrap}
+.kpi span{color:var(--mute);font-size:14px}
+@media(max-width:700px){.kpi{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi div:nth-child(2){border-right:0}.kpi div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+.conf{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:clamp(22px,4vw,56px);margin-top:36px}
+@media(max-width:900px){.conf{grid-template-columns:1fr}}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{flex:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--mute);font:600 16px "Archivo",system-ui,sans-serif;font-stretch:112%;padding:14px 18px;min-height:48px;cursor:pointer;margin-bottom:-1px;transition:color .3s,border-color .3s}
+.tabs button.cur{color:var(--ink);border-color:var(--blue)}
+.vers{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.vers button{min-height:44px;padding:0 16px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:500 15px "Archivo",system-ui,sans-serif;cursor:pointer;transition:all .3s}
+.vers button:hover{border-color:var(--blue)}
+.vers button.cur{background:var(--anth);border-color:var(--anth);color:#fff}
+.plan{position:relative;background:#fff;border:1px solid var(--line);aspect-ratio:4/3;display:grid;place-items:center;padding:clamp(10px,2vw,26px);overflow:hidden}
+.plan img{max-height:100%;width:auto;max-width:100%;object-fit:contain;transition:opacity .45s,transform .6s cubic-bezier(.2,.7,.2,1)}
+.plan img.out{opacity:0;transform:scale(.97)}
+.plan .tag{position:absolute;left:14px;top:12px;font-size:13px;font-weight:600;color:#3f7f8f}
+.plan .zoom{position:absolute;right:10px;top:8px;min-height:40px;padding:0 12px;border:1px solid #dde5e8;background:#fff;color:#24282c;font:500 14px "Archivo",system-ui,sans-serif;cursor:pointer}
+.vdesc{margin:16px 0 0;color:var(--mute)}
+.sum{background:var(--anth);color:#eef2f3;padding:clamp(22px,3vw,32px);position:sticky;top:90px;align-self:start}
+.sum .big{display:flex;gap:28px;margin:16px 0 20px;flex-wrap:wrap}
+.sum .big strong{display:block;font-size:56px;line-height:1;font-stretch:120%;font-weight:600;color:var(--warm)}
+.sum .big span{font-size:14px;color:#a9b3b9}
+.sum ol{list-style:none;padding:0;margin:0 0 20px;border-top:1px solid #3a4046}
+.sum li{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #3a4046;font-size:15px}
+.sum li span{color:#a9b3b9}
+.sum textarea{width:100%;min-height:120px;background:#1b1e21;color:#eef2f3;border:1px solid #3a4046;font:15px/1.5 "Archivo",system-ui,sans-serif;padding:12px;resize:vertical;margin:8px 0}
+.sum .note{font-size:13px;color:#a9b3b9;margin:10px 0 0}
+.pn{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.lb{position:fixed;inset:0;z-index:80;background:rgba(15,17,19,.92);display:none;place-items:center;padding:20px}
+.lb.show{display:grid}
+.lb img{max-width:100%;max-height:88svh;background:#fff;padding:20px}
+.lb button{position:absolute;top:14px;right:14px}
+
+.rv{opacity:0;transform:translateY(34px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+.sweep{position:fixed;inset:0;z-index:90;background:var(--anth);pointer-events:none;transform:scaleY(0);transform-origin:bottom}
+.sweep.run{animation:sweep 1s cubic-bezier(.7,0,.3,1)}
+@keyframes sweep{0%{transform:scaleY(0);transform-origin:bottom}45%{transform:scaleY(1);transform-origin:bottom}55%{transform:scaleY(1);transform-origin:top}100%{transform:scaleY(0);transform-origin:top}}
+/* nézetváltó */
+.views{position:relative}
+.vt{display:inline-flex;border:1px solid #3a4046;margin-bottom:18px}
+.vt button{min-height:44px;padding:0 18px;background:none;border:0;color:#a9b3b9;font-weight:600;font-stretch:110%;cursor:pointer;transition:all .3s}
+.vt button.cur{background:var(--blue);color:#132126}
+.site{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s;background:#7cb6c4;overflow:hidden}
+.views.plan .site{opacity:1;pointer-events:auto}
+.site img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.25);transform-origin:55% 35%;transition:transform 1.4s cubic-bezier(.3,0,.15,1)}
+.views.plan .site img,.views.plan .site svg{transform:scale(1.55)}
+.site svg{position:absolute;inset:0;width:100%;height:100%;transform:scale(1.25);transform-origin:55% 35%;transition:transform 1.4s cubic-bezier(.3,0,.15,1)}
+.sp{fill:rgba(255,255,255,0);stroke:rgba(255,255,255,0);stroke-width:2;cursor:pointer;transition:fill .4s,stroke .4s}
+.sp.cur{fill:rgba(255,194,122,.55);stroke:#fff}
+.site .north{position:absolute;right:14px;bottom:12px;color:#123a44;font-size:13px;font-weight:600}
+
+/* belső terek */
+.inside{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:clamp(14px,2vw,26px);align-items:start}
+.inside .t{grid-column:1/6;align-self:center}
+.inside .f1{grid-column:6/13;aspect-ratio:16/10}
+.inside .f2{grid-column:2/9;aspect-ratio:16/9;margin-top:clamp(-90px,-6vw,0px)}
+.inside .t2{grid-column:9/13;align-self:end}
+@media(max-width:860px){.inside>*{grid-column:1/-1!important;margin:0!important}}
+
+/* zsaluzia */
+.blinds{position:relative;aspect-ratio:1800/1013;overflow:hidden;background:#222;--v:0}
+.blinds img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.blinds .closed{clip-path:inset(0 0 calc(100% - var(--v)*1%) 0)}
+.blinds .edge{position:absolute;left:0;right:0;top:calc(var(--v)*1%);height:2px;background:var(--blue);box-shadow:0 0 18px var(--blue);opacity:calc(var(--v)/8)}
+.bctl{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:18px}
+.bctl input{flex:1 1 220px;accent-color:#7cb6c4;height:44px}
+.bctl output{min-width:5ch;font-weight:600;font-stretch:115%;text-align:right}
+
+/* vízszintes galéria */
+.hgal{position:relative;height:340svh;background:var(--anth);color:#eef2f3}
+.hgal .pin2{position:sticky;top:0;height:100svh;overflow:hidden;display:grid;grid-template-rows:auto minmax(0,1fr);padding:clamp(70px,10vh,110px) 0 clamp(24px,5vh,50px)}
+.hgal .head{padding:0 max(5vw,18px);display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:clamp(16px,3vh,32px)}
+.track{display:flex;align-items:center;gap:clamp(14px,2vw,28px);padding:0 max(5vw,18px);height:100%;will-change:transform}
+.track figure{margin:0;flex:none;height:min(100%,58svh);aspect-ratio:16/10;position:relative;overflow:hidden;cursor:zoom-in}
+.track figure:nth-child(even){transform:translateY(5svh)}.track figure:nth-child(odd){transform:translateY(-3svh)}
+.track img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.track figure:hover img{transform:scale(1.05)}
+.track figcaption{position:absolute;left:0;right:0;bottom:0;padding:40px 16px 14px;background:linear-gradient(0deg,rgba(0,0,0,.7),transparent);font-size:14px}
+.gcount{font-stretch:120%;font-weight:600;font-size:22px;color:var(--blue)}
+@media(max-width:700px){.hgal{height:auto}.hgal .pin2{position:relative;height:auto}.track{overflow-x:auto;height:62svh;transform:none!important;scroll-snap-type:x mandatory}.track figure{scroll-snap-align:center;max-width:86vw}}
+
+/* aloldal hangulat */
+.mood{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:clamp(12px,2vw,24px);margin-top:clamp(40px,6vw,80px)}
+.mood .frame{aspect-ratio:16/10}
+@media(max-width:800px){.mood{grid-template-columns:1fr}}
+
+/* koncepció – helyszínrajzos bejárás */
+.concept{background:var(--paper)}
+.cgrid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+.cstage{position:relative}
+.cplan{position:sticky;top:0;height:100svh;overflow:hidden;background:#7cb6c4}
+.cv{position:absolute;left:0;top:0;height:100%;aspect-ratio:1800/1013;transform-origin:0 0;transition:transform 1.5s cubic-bezier(.65,0,.2,1);will-change:transform}
+.cv img,.cv svg{position:absolute;inset:0;width:100%;height:100%}
+.road{fill:none;stroke:#24282c;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 2.2s cubic-bezier(.6,0,.2,1)}
+.car{fill:#ffc27a;stroke:#24282c;stroke-width:2;opacity:0;transition:opacity .6s}
+.park{fill:rgba(255,194,122,0);stroke:rgba(36,40,44,0);stroke-width:3;stroke-dasharray:8 6;transition:all .8s}
+.cu polygon{fill:rgba(255,194,122,0);stroke:rgba(255,255,255,0);stroke-width:3;transition:fill .6s,stroke .6s}
+.gard circle{fill:rgba(255,255,255,0);stroke:rgba(36,40,44,0);stroke-width:2;transition:all .8s;transform-box:fill-box;transform-origin:center}
+.nrt circle{fill:none;stroke:#24282c;stroke-width:2;opacity:0;transform-box:fill-box;transform-origin:center}
+.cplan[data-k="1"] .road,.cplan[data-k="2"] .road,.cplan[data-k="3"] .road,.cplan[data-k="4"] .road,.cplan[data-k="5"] .road{stroke-dashoffset:0}
+.cplan[data-k="1"] .car,.cplan[data-k="2"] .car{opacity:1}
+.cplan[data-k="2"] .park{fill:rgba(255,194,122,.45);stroke:#24282c}
+.cplan[data-k="3"] .cu polygon{fill:rgba(255,194,122,.55);stroke:#fff}
+.cplan[data-k="3"] .cu polygon:nth-child(2){transition-delay:.15s}.cplan[data-k="3"] .cu polygon:nth-child(3){transition-delay:.3s}.cplan[data-k="3"] .cu polygon:nth-child(4){transition-delay:.45s}
+.cplan[data-k="4"] .gard circle{fill:rgba(255,255,255,.35);stroke:#fff;animation:breathe 2.4s ease-in-out infinite}
+.cplan[data-k="4"] .gard circle:nth-child(2){animation-delay:.3s}.cplan[data-k="4"] .gard circle:nth-child(3){animation-delay:.6s}.cplan[data-k="4"] .gard circle:nth-child(4){animation-delay:.9s}
+@keyframes breathe{50%{transform:scale(1.18)}}
+.cplan[data-k="5"] .nrt circle{opacity:1;animation:ping 2.2s infinite}.cplan[data-k="5"] .nrt circle+circle{animation-delay:1.1s}
+@keyframes ping{from{transform:scale(.6);opacity:1}to{transform:scale(2.4);opacity:0}}
+.clegend{position:absolute;left:18px;top:86px;background:rgba(36,40,44,.82);color:#fff;font-size:13px;padding:7px 12px;backdrop-filter:blur(6px)}
+.cdots{position:absolute;left:18px;bottom:18px;display:flex;gap:8px}
+.cdots i{width:26px;height:3px;background:rgba(36,40,44,.25);transition:background .4s}
+.cdots i.on{background:#24282c}
+.csteps{padding:0 max(5vw,18px) 0 clamp(28px,4vw,64px)}
+.cstep{min-height:92svh;display:flex;flex-direction:column;justify-content:center;max-width:520px;opacity:.25;transition:opacity .6s}
+.cstep.on{opacity:1}
+.cstep h3{font-size:clamp(26px,2.6vw,36px);font-stretch:118%;margin:10px 0 14px}
+.cstep p{color:var(--mute);font-size:17px}
+.cstep .lead{margin-top:20px}
+.cstep .n{font-size:15px;font-weight:700;font-stretch:120%;color:var(--blueT)}
+.cstep .btn{align-self:flex-start;margin-top:8px}
+.cfacts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:var(--anth);color:#eef2f3}
+.cfacts div{padding:clamp(22px,3vw,38px) max(2vw,16px);border-right:1px solid #3a4046}
+.cfacts div:last-child{border:0}
+.cfacts strong{display:block;font-size:clamp(24px,2.8vw,38px);font-stretch:118%;font-weight:600;color:var(--blue);white-space:nowrap}
+.cfacts span{font-size:14px;color:#a9b3b9}
+@media(max-width:860px){.cgrid{grid-template-columns:1fr}.cstage{position:sticky;top:0;height:52svh;z-index:2}.cplan{height:52svh}
+ .csteps{position:relative;z-index:3;margin-top:-6svh}.cstep{min-height:70svh;max-width:none;justify-content:flex-end;padding-bottom:6svh}
+ .cstep>*{background:var(--paper)}.cstep{opacity:1}.cfacts{grid-template-columns:repeat(2,minmax(0,1fr))}.cfacts div:nth-child(2){border-right:0}}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}html{scroll-behavior:auto}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="sweep" id="sweep"></div>
+<header id="hdr">
+  <a class="logo" href="#top" aria-label="JA111 – kezdőlap">
+    <svg viewBox="0 0 190 48" aria-hidden="true">
+      <path class="draw" d="M3 46V20L21 3l18 17v26z" fill="none" stroke="#7cb6c4" stroke-width="2.2" stroke-linejoin="miter"/>
+      <rect class="bar" x="13.2" y="24" width="2.6" height="22" fill="currentColor" style="animation-delay:.9s"/>
+      <rect class="bar" x="19.7" y="19" width="2.6" height="27" fill="currentColor" style="animation-delay:1.05s"/>
+      <rect class="bar" x="26.2" y="24" width="2.6" height="22" fill="currentColor" style="animation-delay:1.2s"/>
+      <text x="52" y="35" fill="currentColor" font-family="Archivo" font-size="27" font-weight="700" style="font-stretch:125%" letter-spacing="1">JA111</text>
+      <line x1="52" y1="43" x2="184" y2="43" stroke="#7cb6c4" stroke-width="1" class="draw" style="animation-delay:.6s"/>
+    </svg>
+  </a>
+  <nav>
+    <a href="#koncepcio">Koncepció</a>
+    <a href="#belso">Belső terek</a>
+    <a href="#galeria">Galéria</a>
+    <a href="#lakasvalaszto" class="keep">Lakásválasztó</a>
+    <a href="#muszaki">Műszaki</a>
+    <a href="#kornyek">Budakeszi</a>
+    <a href="#kapcsolat">Kapcsolat</a>
+  </nav>
+</header>
+
+<main id="home">
+  <section class="intro" id="top">
+    <div class="stage">
+      <div class="media" id="media"></div>
+      <div class="shade"></div>
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 330 120"><path class="draw" d="M30 112V50L72 12l42 38v62z" fill="none" stroke="#7cb6c4" stroke-width="3" style="stroke-dasharray:330;stroke-dashoffset:330"/>
+          <rect class="bar" x="57" y="58" width="5" height="54" fill="#fff" style="animation-delay:1s"/><rect class="bar" x="69.5" y="46" width="5" height="66" fill="#fff" style="animation-delay:1.15s"/><rect class="bar" x="82" y="58" width="5" height="54" fill="#fff" style="animation-delay:1.3s"/>
+          <text x="128" y="96" fill="#fff" font-family="Archivo" font-size="50" font-weight="700" style="font-stretch:125%">JA111</text></svg>
+        <div class="sub">Budakeszi · József Attila utca 111.</div>
+      </div>
+      <div class="copy">
+        <h1><span class="m"><span class="ln" data-t=".08">Négy otthon,</span></span><span class="m"><span class="ln" data-t=".24">egy egykori gyümölcsösben,</span></span><span class="m"><span class="ln" data-t=".40">a <b>Vadaspark</b> szomszédságában.</span></span></h1>
+        <p class="ln" data-t=".56">Saját kert és terasz minden lakóegységhez, 250–260 m² élettér három szinten – húsz percre Budapest központjától.</p>
+        <div class="stats" data-t=".72">
+          <div><strong>4</strong><span>lakóegység</span></div>
+          <div><strong>250–260 m²</strong><span>nettó alapterület</span></div>
+          <div><strong>3–6</strong><span>hálószoba, variálható</span></div>
+          <div><strong>7,5 m</strong><span>belmagasság a nappaliban</span></div>
+        </div>
+      </div>
+      <div class="ticks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="cue" aria-hidden="true"><span>Görgessen</span><i></i></div>
+      <div class="pbar" aria-hidden="true"><i></i></div>
+      <button class="vplay" id="vplay" type="button"></button>
+    </div>
+  </section>
+
+  <section class="band" id="erkezes">
+    <div class="wrap arr">
+      <div class="rv">
+        <div class="section-mark">Érkezés</div>
+        <h2>Az utca felől csendes, a kert felé kinyílik.</h2>
+        <p class="lead" style="margin-top:22px">Fedett bejárat, saját garázs, téglaburkolatú lábazat és kerámia tetőfedés. A ház az utcára visszafogott arcát mutatja – a nagy üvegfelületek a kertek és a táj felé fordulnak.</p>
+        <a class="btn" href="#lakasvalaszto" style="margin-top:10px">Tovább a lakásválasztóhoz <svg width="18" height="12" viewBox="0 0 18 12"><path d="M0 6h16M11 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a>
+      </div>
+      <div class="frame rv" style="aspect-ratio:16/10"><img class="px" src="img/erkezes.jpg" alt="Bejárat fa bejárati ajtóval, lépcsővel és garázskapuval, téglaburkolatú lábazattal"><span class="cap">Bejárat és garázs az utca felől</span></div>
+    </div>
+  </section>
+
+  <section class="band dark" id="lakasvalaszto">
+    <div class="wrap">
+      <div class="selhead rv">
+        <div><div class="section-mark">Lakásválasztó</div><h2>Válassza ki, melyik ablak mögött szeretne hazaérni.</h2></div>
+        <div class="hint"><span class="bulb"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg></span>Vigye az egeret egy lakóegységre, és felkapcsoljuk benne a villanyt. Kattintással megnyílik az adatlapja és az alaprajzi változatok.</div>
+      </div>
+      <div class="rv"><div class="vt" role="tablist" aria-label="Nézet"><button type="button" class="cur" data-v="3d">Látványterv</button><button type="button" data-v="plan">Helyszínrajz</button></div>
+      <div class="views" id="views"><div id="selScene"></div>
+        <div class="site" id="site"><img src="img/helyszinrajz.jpg" alt="Helyszínrajz: a négy lakóegység (A–D) a telek végében, bekötőúttal az utca felől"><svg viewBox="0 0 1800 1013" preserveAspectRatio="xMidYMid slice"></svg><span class="north">Helyszínrajz · É ↑ jelölés a rajzon</span></div>
+      </div></div>
+      <div class="units rv" id="ucards"></div>
+    </div>
+  </section>
+
+  <section class="concept" id="koncepcio">
+    <div class="cgrid">
+      <div class="cstage"><div class="cplan" id="cplan"><div class="cv" id="cv">
+        <img src="img/helyszinrajz.jpg" alt="Helyszínrajz: bekötőút az utcától, vendégparkoló, a négy lakóegység (A–D) saját kertekkel">
+        <svg viewBox="0 0 1800 1013">
+          <path class="road" d="M640 905 L662 880 L690 820 L728 755 L760 700 L790 650 L812 600 L828 545 L842 505 L850 470 L857 425 L875 380 L895 335 L918 290 L940 245 L962 200 L985 155 L1012 112 M852 460 L880 466 L905 472" pathLength="1"/>
+          <circle class="car" r="7"><animateMotion dur="7s" repeatCount="indefinite" path="M640 905 L662 880 L690 820 L728 755 L760 700 L790 650 L812 600 L828 545 L842 505 L850 470 L857 425 L875 380 L895 335 L918 290 L940 245 L962 200 L985 155 L1012 112" rotate="auto"/></circle>
+          <polygon class="park" points="625,840 660,765 700,780 665,855"/>
+          <g class="cu"><polygon data-u="a" points="862,391 998,471 1034,409 898,329"/><polygon data-u="b" points="899,316 1035,396 1071,334 935,254"/><polygon data-u="c" points="934,249 1070,329 1106,267 970,187"/><polygon data-u="d" points="969,181 1105,261 1141,199 1005,119"/></g>
+          <g class="gard"><circle cx="985" cy="430" r="30"/><circle cx="1025" cy="355" r="30"/><circle cx="1060" cy="285" r="30"/><circle cx="1100" cy="200" r="30"/></g>
+          <g class="nrt"><circle cx="1148" cy="272" r="26"/><circle cx="1148" cy="272" r="26"/></g>
+        </svg></div>
+        <div class="clegend" id="clegend">Helyszínrajz</div>
+        <div class="cdots" id="cdots"></div>
+      </div></div>
+      <div class="csteps">
+        <article class="cstep" data-f="850,520" data-s="1.05" data-k="0"><div class="section-mark">Koncepció</div><h2>Egy telek, négy saját világ.</h2><p class="lead">A József Attila utca 111. hosszú, mély telek: az utcától egy csendes bekötőút vezet a telek végébe, ahol a négy lakóegység a fák között áll. Görgessen, és bejárjuk.</p></article>
+        <article class="cstep" data-f="760,690" data-s="1.7" data-k="1"><span class="n">01</span><h3>Csendes bekötőút</h3><p>A házak nem az utcafronton állnak: saját, kanyargó bekötőút vezet a telek mélyére, távol a forgalomtól és a zajtól.</p></article>
+        <article class="cstep" data-f="660,810" data-s="2.8" data-k="2"><span class="n">02</span><h3>Vendégparkoló a bejáratnál</h3><p>Az utca felőli bejárat mellett külön parkolóhelyek várják a vendégeket, így a lakók útja szabad marad.</p></article>
+        <article class="cstep" data-f="1000,300" data-s="2.3" data-k="3"><span class="n">03</span><h3>Egy ház, négy egység</h3><p>A négy egységre osztott épület félszintes eltolással simul az enyhén lejtős terepbe. Minden egység három szinten, 250–260 m²-en, saját bejárattal.</p></article>
+        <article class="cstep" data-f="1045,300" data-s="2.5" data-k="4"><span class="n">04</span><h3>Saját kert minden lakásnak</h3><p>A nagy üvegfelületek és a teraszok a telek csendes, kerti oldala felé fordulnak. Minden lakóegységhez saját kert és terasz tartozik – a D egységnél 52,9 m²-es terasszal.</p></article>
+        <article class="cstep" data-f="1060,260" data-s="1.8" data-k="5"><span class="n">05</span><h3>Fény és tájolás</h3><p>A ház a telek remek tájolását kihasználva nyílik a fény felé. A 7,5 méteres belmagasságú nappali a panorámát a ház részévé teszi.</p><a class="btn" href="#lakasvalaszto">Lakásválasztó <svg width="18" height="12" viewBox="0 0 18 12"><path d="M0 6h16M11 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a></article>
+      </div>
+    </div>
+    <div class="cfacts">
+      <div><strong>7,5 m</strong><span>belmagasság a nappaliban</span></div>
+      <div><strong>3–6</strong><span>hálószoba, variálható</span></div>
+      <div><strong>½</strong><span>szintes eltolás, privát élettér</span></div>
+      <div><strong>37,8–52,9 m²</strong><span>terasz egységenként</span></div>
+    </div>
+  </section>
+
+  <section class="band" id="belso" style="padding-top:0">
+    <div class="wrap inside">
+      <div class="t rv"><div class="section-mark">Belső terek</div><h2>Fény, fa, levegő.</h2>
+        <p class="lead" style="margin-top:22px">Egybenyitott nappali, étkező és konyha, áttört lépcsővel. A hatalmas üvegfelületek a teraszt és a kertet a nappali részévé teszik.</p></div>
+      <div class="frame f1 rv"><img class="px" src="img/etkezo.jpg" alt="Étkező kerek asztallal, áttört fa lépcsővel és kertre néző üvegfalakkal"><span class="cap">Étkező és lépcsőtér</span></div>
+      <div class="frame f2 rv"><img class="px" src="img/nappali.jpg" alt="Nappali kék kanapékkal, mögötte nyitott konyha, oldalt üvegfal a terasz felé"><span class="cap">Nappali, háttérben a konyha</span></div>
+      <div class="t2 rv"><p style="color:var(--mute)">A félszintes eltolás miatt minden élettér önálló, mégis egybefűzött. A belső elrendezés szintenként választható – a lakásválasztóban egyenként végigkattinthatja.</p></div>
+    </div>
+  </section>
+
+  <section class="band dark" id="arnyekolas">
+    <div class="wrap">
+      <div class="selhead rv">
+        <div><div class="section-mark" style="color:var(--blue)">Árnyékolás</div><h2>Egy mozdulat, és leereszkednek a zsaluziák.</h2></div>
+        <p class="lead">Az időjáráshoz igazodó, automatizált zsaluziák nyáron hűvösen tartják a házat, este pedig teljes magánszférát adnak. Húzza a csúszkát.</p>
+      </div>
+      <div class="blinds rv" id="blinds"><img src="img/homlokzat.jpg" alt="Az épület kerti homlokzata nyitott üvegfelületekkel"><img class="closed" src="img/zsaluzia.jpg" alt="Ugyanaz a homlokzat leeresztett zsaluziákkal"><span class="edge"></span></div>
+      <div class="bctl"><label for="bl" style="color:var(--mute)">Zsaluziák</label><input type="range" id="bl" min="0" max="100" value="0"><output id="blo">0%</output></div>
+    </div>
+  </section>
+
+  <section class="band" id="muszaki" style="background:var(--paper)">
+    <div class="wrap">
+      <div class="rv" style="max-width:760px">
+        <div class="section-mark">Műszaki tartalom</div>
+        <h2>Időtálló anyagok, csendes technológia.</h2>
+        <p class="lead" style="margin-top:22px">Korszerű építészeti és gépészeti megoldások: tartós, kényelmes, energiahatékony és biztonságos otthonok.</p>
+      </div>
+      <div class="spec rv" id="spec"></div>
+    </div>
+  </section>
+
+  <section class="hgal" id="galeria">
+    <div class="pin2">
+      <div class="head"><div><div class="section-mark" style="color:var(--blue)">Galéria</div><h2>Körbejárjuk a házat.</h2></div><span class="gcount" id="gcount">01 / 07</span></div>
+      <div class="track" id="track"></div>
+    </div>
+  </section>
+
+  <section class="band" id="kornyek">
+    <div class="wrap two">
+      <div class="rv">
+        <div class="section-mark">Budakeszi</div>
+        <h2>Kisváros az erdő aljában, húsz percre a belvárostól.</h2>
+        <p class="lead" style="margin-top:22px">Budakeszi folyamatosan fejlődik, mégis megőrizte kisvárosi hangulatát. A József Attila utca a település egyik legszélső utcája, közel az erdőhöz – a kis méret miatt mégis minden közel van.</p>
+        <ul class="near">
+          <li>Patika<span>az utcában</span></li>
+          <li>Élelmiszerboltok<span>sétatávolság</span></li>
+          <li>Általános iskola és gimnázium<span>sétatávolság</span></li>
+          <li>Játszótér, focipálya, posta<span>néhány perc</span></li>
+          <li>Uszoda<span>épülőben</span></li>
+          <li>Budakeszi Vadaspark, erdei túraútvonalak<span>szomszédság</span></li>
+        </ul>
+      </div>
+      <div class="map rv" aria-label="Sematikus helyszínrajz: Budakeszi és Budapest">
+        <svg viewBox="0 0 500 460" preserveAspectRatio="xMidYMid slice">
+          <defs><pattern id="tr" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="9" cy="9" r="3" fill="#7cb6c4" opacity=".28"/></pattern></defs>
+          <path d="M0 0H230C210 90 160 150 120 230 80 310 40 360 0 380Z" fill="url(#tr)"/>
+          <path d="M60 330C150 300 220 270 300 250S430 200 500 180" fill="none" stroke="#7cb6c4" stroke-width="2" stroke-dasharray="2 8" stroke-linecap="round"><animate attributeName="stroke-dashoffset" from="0" to="-60" dur="2.4s" repeatCount="indefinite"/></path>
+          <circle cx="150" cy="300" r="34" fill="none" stroke="#7cb6c4" opacity=".5"><animate attributeName="r" values="20;44;20" dur="3.4s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0;.6" dur="3.4s" repeatCount="indefinite"/></circle>
+          <path d="M138 312v-18l12-11 12 11v18z" fill="#24282c"/>
+          <text x="174" y="306" font-family="Archivo" font-size="17" font-weight="700" fill="currentColor">JA111</text>
+          <text x="174" y="326" font-family="Archivo" font-size="13" fill="currentColor" opacity=".65">József Attila u. 111.</text>
+          <text x="40" y="120" font-family="Archivo" font-size="14" fill="currentColor" opacity=".7">Vadaspark, erdő</text>
+          <rect x="420" y="150" width="62" height="62" fill="none" stroke="currentColor" opacity=".5"/>
+          <text x="404" y="236" font-family="Archivo" font-size="14" fill="currentColor" opacity=".8">Budapest</text>
+          <text x="282" y="236" font-family="Archivo" font-size="22" font-weight="700" fill="#3f7f8f">20 perc</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="band dark" id="kapcsolat">
+    <div class="wrap contact">
+      <div class="rv">
+        <div class="section-mark" style="color:var(--blue)">Kapcsolat</div>
+        <h2>Nézze meg személyesen, még szerkezetkész állapotban.</h2>
+        <p class="lead" style="margin-top:22px">Érdeklődését, bejárási igényét és alaprajzi kérdéseit ugyanazon a napon megválaszoljuk. Várjuk megtisztelő érdeklődését!</p>
+      </div>
+      <div class="card rv">
+        <div class="row"><span>Kapcsolattartó</span><strong>Popescu Balázs</strong></div>
+        <div class="row"><span>Telefon</span><a href="tel:+36204949499">+36 20 494 9499</a></div>
+        <div class="row"><span>E-mail</span><a href="mailto:popescu.balazs@tarsmester.hu">popescu.balazs@tarsmester.hu</a></div>
+        <div class="row"><span>Cím</span><strong>2092 Budakeszi, József Attila u. 111.</strong></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<main id="unit"></main>
+
+<footer>
+  <span>Az oldalon található alaprajzok, látványtervek és adatok tájékoztató jellegűek, a változtatás jogát fenntartjuk.</span>
+  <span>3D render: Orley Balázs · © 2025 Társmester Kft.</span>
+</footer>
+<div class="lb" id="lb" role="dialog" aria-label="Alaprajz nagyítva"><img alt=""><button class="btn fill" type="button">Bezárás</button></div>
+
+<script>
+{
+const W=1800,H=1013;
+const U={
+ a:{L:'A',net:'250,0',ter:'37,8',sto:'4,0',key:'A',pin:[700,560],poly:'485,705 560,610 700,490 880,442 1000,790 900,805 860,835 700,905 600,905 490,875',bb:[492,453,961,950],
+    F:[['Garázs + vendégszoba',1,1,'Egyállásos garázs, mellette külön bejáratú vendég- vagy dolgozószoba.'],['Garázs + többcélú helyiség',0,1,'Egyállásos garázs, tágasabb többcélú helyiség (műhely, hobbi, tároló).'],['Kétállásos garázs',0,2,'Két autónak kényelmes, egybefüggő garázs.']],
+    E:[['3 hálószoba',3,0,'Három hálószoba, a master hálóhoz saját fürdő és gardrób tartozik.'],['4 hálószoba',4,0,'Négy önálló hálószoba két fürdővel – nagycsaládnak.'],['3 hálószoba, master lakosztály',3,0,'Három hálószoba, tágasabb master lakosztállyal.']],
+    T:[['Tetőtéri hálószoba',1,0,'Tetőtéri hálószoba tetősíkablakokkal és galériával.'],['Tetőtéri nappali / dolgozó',0,0,'Második nappali, dolgozó vagy könyvtárszoba a tető alatt.']]},
+ b:{L:'B',net:'249,6',ter:'37,8',sto:'4,0',key:'BC',pin:[985,430],poly:'880,442 1135,322 1245,650 1150,668 1000,720 1000,790',bb:[847,328,1207,716]},
+ c:{L:'C',net:'249,6',ter:'37,8',sto:'4,0',key:'BC',pin:[1235,310],poly:'1135,322 1345,215 1450,515 1350,535 1245,560 1245,650',bb:[1102,198,1401,575]},
+ d:{L:'D',net:'260,2',ter:'52,9',sto:null,key:'D',pin:[1475,185],poly:'1345,215 1420,130 1500,110 1600,150 1605,390 1520,420 1450,515',bb:[1342,93,1653,430],
+    F:[['Garázs + vendégszoba',1,1,'Egyállásos garázs, mellette külön bejáratú vendég- vagy dolgozószoba.'],['Kétállásos garázs',0,2,'Két autónak kényelmes, egybefüggő garázs.']],
+    E:[['4 hálószoba',4,0,'Négy hálószoba, a master hálószobához saját fürdő tartozik.'],['3 hálószoba, master lakosztály',3,0,'Három hálószoba, kádas fürdős master lakosztállyal.']],
+    T:[['Tetőtéri nappali / dolgozó',0,0,'Második nappali, dolgozó vagy könyvtárszoba a tető alatt.'],['Tetőtéri hálószoba',1,0,'Tetőtéri hálószoba tetősíkablakokkal és galériával.']]}
+};
+const BC={F:U.a.F,E:[['3 hálószoba, master lakosztály',3,0,'Három hálószoba, saját fürdős master lakosztállyal.'],['3 hálószoba, kádas fürdő',3,0,'Három hálószoba, közös kádas fürdővel és master fürdővel.'],['4 hálószoba',4,0,'Négy önálló hálószoba két fürdővel – nagycsaládnak.']],T:[U.d.T[0],U.d.T[1]]};
+Object.assign(U.b,BC);Object.assign(U.c,BC);
+const FL={F:'Földszint',E:'Emelet',T:'Tetőtér'};
+const pct=(v,t)=>(v/t*100)+'%';
+const range=u=>{const mn=k=>Math.min(...u[k].map(v=>v[1])),mx=k=>Math.max(...u[k].map(v=>v[1]));return [mn('F')+mn('E')+mn('T'),mx('F')+mx('E')+mx('T')]};
+
+function sceneHTML(id,interactive){
+  let h=`<div class="scene" id="${id}"><div class="layer"><img class="day" src="img/render.jpg" alt="Látványterv a négy lakóegységről"><img class="night" src="img/render_night.jpg" alt="">`;
+  for(const k in U){const b=U[k].bb,s=`left:${pct(b[0],W)};top:${pct(b[1],H)};width:${pct(b[2]-b[0],W)};height:${pct(b[3]-b[1],H)}`;
+    h+=`<img class="glow u-${k}" src="img/glow_${k}.webp" style="${s}" alt=""><img class="lit u-${k}" src="img/lit_${k}.webp" style="${s}" alt="">`}
+  if(interactive){h+=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">`+Object.keys(U).map(k=>`<polygon class="hit" data-u="${k}" points="${U[k].poly}"><title>${U[k].L} lakóegység</title></polygon>`).join('')+`</svg>`;
+    h+=Object.keys(U).map(k=>`<button class="pin" data-u="${k}" style="left:${pct(U[k].pin[0],W)};top:${pct(U[k].pin[1],H)}" aria-label="${U[k].L} lakóegység megnyitása">${U[k].L}</button>`).join('')}
+  return h+`</div>${interactive?'<div class="tip" id="tip"></div>':''}</div>`;
+}
+function light(sc,k){
+  sc.classList.toggle('on',!!k);
+  sc.querySelectorAll('.lit,.glow').forEach(e=>{const m=k&&e.classList.contains('u-'+k);e.classList.toggle('go',!!m);if(!m)e.style.opacity=''});
+  sc.querySelectorAll('.hit,.pin').forEach(e=>e.classList.toggle('cur',e.dataset.u===k));
+  document.querySelectorAll('.ucard').forEach(e=>e.classList.toggle('cur',e.dataset.u===k));
+}
+
+/* lakásválasztó */
+document.getElementById('selScene').innerHTML=sceneHTML('sc',true);
+document.getElementById('ucards').innerHTML=Object.keys(U).map(k=>{const u=U[k],r=range(u);return `<button class="ucard" data-u="${k}" type="button"><span class="L">${u.L}</span><b>${u.net} m²</b><small>terasz ${u.ter} m² · ${r[0]}–${r[1]} hálószoba</small><svg class="arr" width="20" height="14" viewBox="0 0 18 12"><path d="M0 6h16M11 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>`}).join('');
+const sc=document.getElementById('sc'),tip=document.getElementById('tip'),views=document.getElementById('views'),site=document.getElementById('site');
+views.appendChild(tip);
+const SPL={a:'862,391 998,471 1034,409 898,329',b:'899,316 1035,396 1071,334 935,254',c:'934,249 1070,329 1106,267 970,187',d:'969,181 1105,261 1141,199 1005,119'};
+site.querySelector('svg').innerHTML=Object.keys(SPL).map(k=>`<polygon class="sp" data-u="${k}" points="${SPL[k]}"><title>${U[k].L} lakóegység</title></polygon>`).join('');
+let cur=null,touched=null;
+function show(k){if(k===cur)return;cur=k;light(sc,k);
+  site.querySelectorAll('.sp').forEach(e=>e.classList.toggle('cur',e.dataset.u===k));
+  if(!k){tip.classList.remove('show');return}
+  const u=U[k],r=range(u);
+  tip.innerHTML=`<h3>${u.L} lakóegység</h3><dl><dt>Nettó alapterület</dt><dd>${u.net} m²</dd><dt>Terasz</dt><dd>${u.ter} m²</dd>${u.sto?`<dt>Kültéri tároló</dt><dd>${u.sto} m²</dd>`:''}<dt>Hálószobák</dt><dd>${r[0]}–${r[1]}</dd></dl><div class="go">Adatlap és alaprajzok <span>→</span></div>`;
+  const R=views.getBoundingClientRect(),el=views.classList.contains('plan')?site.querySelector(`.sp[data-u="${k}"]`):sc.querySelector(`.pin[data-u="${k}"]`),E=el.getBoundingClientRect();
+  const px=E.right-R.left,py=E.top+E.height/2-R.top;
+  let x=px+18,y=py-60;if(x+260>R.width)x=E.left-R.left-268;y=Math.max(10,Math.min(y,R.height-230));
+  tip.style.left=x+'px';tip.style.top=y+'px';tip.classList.add('show');
+}
+const open=k=>{location.hash='lakas-'+k};
+views.addEventListener('pointerover',e=>{const t=e.target.closest('[data-u]');if(t)show(t.dataset.u)});
+views.addEventListener('pointerleave',()=>show(null));
+views.addEventListener('click',e=>{const t=e.target.closest('[data-u]');if(!t)return;const k=t.dataset.u;
+  if(matchMedia('(hover:none)').matches&&touched!==k){touched=k;show(k);return}open(k)});
+document.querySelector('.vt').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  document.querySelectorAll('.vt button').forEach(x=>x.classList.toggle('cur',x===b));views.classList.toggle('plan',b.dataset.v==='plan');show(null)});
+document.getElementById('ucards').addEventListener('click',e=>{const t=e.target.closest('[data-u]');if(t)open(t.dataset.u)});
+document.getElementById('ucards').addEventListener('pointerover',e=>{const t=e.target.closest('[data-u]');if(t)show(t.dataset.u)});
+document.getElementById('ucards').addEventListener('pointerleave',()=>show(null));
+
+/* műszaki */
+const ic={
+ brick:'<path d="M4 9h32M4 18h32M4 27h32M4 36h32M14 9v9M26 18v9M14 27v9M4 4h32v32H4z"/>',
+ roof:'<path d="M3 24L20 8l17 16M8 20v15h24V20M14 30h12"/>',
+ win:'<path d="M8 8l24-4v28L8 36zM20 6v28M8 21h24"/>',
+ door:'<path d="M9 4h22v32H9zM14 9h12v22H14zM23 20h1"/>',
+ deck:'<path d="M3 14h34M3 21h34M3 28h34M3 35h34M10 14v21M24 21v14"/>',
+ pump:'<circle cx="20" cy="20" r="14"/><path d="M20 6c4 6 4 10 0 14s-4 8 0 14M6 20c6-4 10-4 14 0s8 4 14 0"/>',
+ air:'<path d="M4 14h22a5 5 0 1 0-5-5M4 22h28a5 5 0 1 1-5 5M4 30h14"/>',
+ blind:'<path d="M6 5h28M8 5v24M32 5v24M8 11h24M8 17h24M8 23h24M8 29h24M20 29v6"/>',
+ home:'<path d="M5 19L20 6l15 13M9 16v19h22V16"/><path d="M15 25a7 7 0 0 1 10 0M17.5 28.5a3 3 0 0 1 5 0"/>'};
+const SP=[['brick','Vandersanden téglaburkolat','Prémium külső téglaburkolat, amely évtizedekig megőrzi karakterét.'],
+['roof','Robe kerámia cserépfedés','Időtálló kerámia tetőfedés, letisztult, természetes megjelenés.'],
+['win','Velux tetősíkablakok','Motorosan vezérelhető tetősíkablakok – fény a tetőtérben is.'],
+['door','Egyedi fa nyílászárók','Egyedi gyártású fa nyílászárók a hatalmas üvegfelületekhez.'],
+['deck','Massaranduba teraszburkolat','Tartós, trópusi keményfa a teraszokon.'],
+['pump','Daikin hőszivattyú','Mennyezet- és padlófűtés, mennyezethűtés, helyiségenként szabályozva.'],
+['air','Hővisszanyerős szellőztetés','Folyamatos friss levegő, kisebb energiaveszteség mellett.'],
+['blind','Automata zsaluziák','Időjáráshoz igazodó, automatizált árnyékolás.'],
+['home','Intelligens otthonvezérlés','A gépészet és a világítás egy rendszerben hangolható össze.']];
+document.getElementById('spec').innerHTML=SP.map(s=>`<div><svg viewBox="0 0 40 40">${ic[s[0]]}</svg><h3>${s[1]}</h3><p>${s[2]}</p></div>`).join('');
+
+/* aloldal */
+const sel={};
+function unitHTML(k){
+  const u=U[k],r=range(u),ks=Object.keys(U),i=ks.indexOf(k),prev=ks[(i+3)%4],next=ks[(i+1)%4];
+  return `<section class="uhero">${sceneHTML('usc',false)}
+   <div class="over"><div><div class="bigL">${u.L}</div><h1>${u.L} lakóegység</h1><p>Saját kert és terasz, három szint, félszintes eltolással – Budakeszi, József Attila utca 111.</p></div>
+   <div><div style="font-size:14px;color:#a9b3b9;margin-bottom:8px">Lakóegységek</div><div class="usw">${ks.map(x=>`<a href="#lakas-${x}" class="${x===k?'cur':''}">${U[x].L}</a>`).join('')}</div></div></div></section>
+  <div class="kpi"><div><strong>${u.net} m²</strong><span>beépített nettó alapterület</span></div><div><strong>${u.ter} m²</strong><span>terasz</span></div><div><strong>${u.sto?u.sto+' m²':'3 szint'}</strong><span>${u.sto?'kültéri tároló':'földszint, emelet, tetőtér'}</span></div><div><strong>${r[0]}–${r[1]}</strong><span>hálószoba, választható</span></div></div>
+  <section class="band"><div class="wrap">
+   <div class="rv" style="max-width:760px"><div class="section-mark">Alaprajzi lehetőségek</div><h2>Rakja össze a saját elrendezését.</h2>
+   <p class="lead" style="margin-top:20px">Szintenként több változat közül választhat. A jobb oldalon azonnal látja, hány hálószobás és hány autóbeállós otthont kap.${k==='d'?' A D lakóegységhez tartozik a legnagyobb, 52,9 m²-es terasz, az alaprajzon pezsgőfürdő helyével.':''}</p></div>
+   <div class="conf">
+    <div class="rv"><div class="tabs" role="tablist">${['F','E','T'].map((f,j)=>`<button role="tab" data-f="${f}" class="${j?'':'cur'}">${FL[f]}</button>`).join('')}</div>
+     <div class="vers" id="vers"></div>
+     <div class="plan"><span class="tag" id="ptag"></span><button class="zoom" type="button" id="zoom">Nagyítás</button><img id="pimg" alt=""></div>
+     <p class="vdesc" id="vdesc"></p></div>
+    <aside class="sum rv"><div style="font-size:14px;color:var(--blue);font-weight:600">Az Ön összeállítása</div>
+     <div class="big"><div><strong id="sBed">0</strong><span>hálószoba</span></div><div><strong id="sCar">0</strong><span>garázsállás</span></div></div>
+     <ol id="sList"></ol>
+     <label for="msg" style="font-size:14px;color:#a9b3b9">Érdeklődés ezzel a kombinációval</label>
+     <textarea id="msg" readonly></textarea>
+     <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn fill" type="button" id="copy">Szöveg másolása</button><a class="btn" href="#kapcsolat" id="toC">Kapcsolat</a></div>
+     <p class="note">Küldje el: popescu.balazs@tarsmester.hu · +36 20 494 9499</p></aside>
+   </div>
+   <div class="mood">
+     <div class="frame rv"><img class="px" src="img/${k==='d'?'terasz':'etkezo'}.jpg" alt="${k==='d'?'A D lakóegység terasza pezsgőfürdővel':'Étkező áttört lépcsővel'}"><span class="cap">${k==='d'?'Terasz pezsgőfürdővel':'Étkező és lépcsőtér'} · illusztráció</span></div>
+     <div class="frame rv"><img class="px" src="img/nappali.jpg" alt="Nappali kanapékkal, háttérben konyha"><span class="cap">Nappali · illusztráció</span></div>
+   </div>
+   <div class="pn" style="margin-top:56px"><a class="btn" href="#lakas-${prev}">← ${U[prev].L} lakóegység</a><a class="btn" href="#lakasvalaszto">Vissza a lakásválasztóhoz</a><a class="btn" href="#lakas-${next}">${U[next].L} lakóegység →</a></div>
+  </div></section>`;
+}
+function renderUnit(k){
+  const u=U[k];sel[k]=sel[k]||{F:0,E:0,T:0};const s=sel[k];let fl='F';
+  const box=document.getElementById('unit');box.innerHTML=unitHTML(k);
+  const us=document.getElementById('usc'),lay=us.querySelector('.layer');
+  const cx=(u.bb[0]+u.bb[2])/2/W*100,cy=(u.bb[1]+u.bb[3])/2/H*100;
+  lay.style.transformOrigin=`${cx}% ${cy}%`;
+  requestAnimationFrame(()=>{lay.style.transform=`scale(${k==='a'?1.55:1.9}) translateX(${(55-cx)*0.35}%)`;setTimeout(()=>light(us,k),500)});
+  const vers=document.getElementById('vers'),img=document.getElementById('pimg');
+  function draw(anim){
+    vers.innerHTML=u[fl].map((v,i)=>`<button type="button" data-i="${i}" class="${i===s[fl]?'cur':''}">${i+1}. változat · ${v[0]}</button>`).join('');
+    const v=u[fl][s[fl]],src=`img/plans/${u.key}_${fl}_${s[fl]+1}.webp`;
+    document.getElementById('ptag').textContent=FL[fl]+' · '+(s[fl]+1)+'. változat';
+    document.getElementById('vdesc').textContent=v[3];
+    if(anim){img.classList.add('out');setTimeout(()=>{img.src=src;img.alt=`${u.L} lakóegység ${FL[fl].toLowerCase()} alaprajz, ${s[fl]+1}. változat`;img.onload=()=>img.classList.remove('out')},250)}else{img.src=src}
+    let bed=0,car=0;const li=[];
+    for(const f of ['F','E','T']){const x=u[f][s[f]];bed+=x[1];car+=x[2];li.push(`<li><span>${FL[f]}</span>${s[f]+1}. vált. – ${x[0]}</li>`)}
+    count(document.getElementById('sBed'),bed);count(document.getElementById('sCar'),car);
+    document.getElementById('sList').innerHTML=li.join('');
+    document.getElementById('msg').value=`Tisztelt Popescu Balázs!\n\nÉrdeklődni szeretnék a JA111 ${u.L} lakóegységéről a következő elrendezéssel: földszint ${s.F+1}., emelet ${s.E+1}., tetőtér ${s.T+1}. változat (${bed} hálószoba, ${car} garázsállás). Kérem, keressen az elérhetőséggel és a bejárás lehetőségével kapcsolatban.\n\nÜdvözlettel:`;
+  }
+  box.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;fl=b.dataset.f;box.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('cur',x===b));draw(true)});
+  vers.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;s[fl]=+b.dataset.i;draw(true)});
+  document.getElementById('copy').addEventListener('click',async e=>{try{await navigator.clipboard.writeText(document.getElementById('msg').value);e.target.textContent='Kimásolva ✓'}catch(_){document.getElementById('msg').select();e.target.textContent='Jelölje ki és másolja'}});
+  document.getElementById('zoom').addEventListener('click',()=>{const lb=document.getElementById('lb');lb.querySelector('img').src=img.src;lb.querySelector('img').alt=img.alt;lb.classList.add('show')});
+  draw(false);reveal();
+}
+document.getElementById('lb').addEventListener('click',()=>document.getElementById('lb').classList.remove('show'));
+
+function count(el,to){const from=+el.textContent||0,t0=performance.now();const st=n=>{const p=Math.min(1,(n-t0)/500);el.textContent=Math.round(from+(to-from)*p);if(p<1)requestAnimationFrame(st)};requestAnimationFrame(st)}
+
+/* útválasztás */
+let last=null;
+function route(){
+  const h=location.hash.slice(1),m=/^lakas-([abcd])$/.exec(h);
+  const target=m?'u'+m[1]:'home';
+  const go=()=>{
+    if(m){document.body.classList.add('unit');renderUnit(m[1]);window.scrollTo(0,0)}
+    else{document.body.classList.remove('unit');document.getElementById('unit').innerHTML='';const el=h&&document.getElementById(h);if(el)el.scrollIntoView();else if(!h)window.scrollTo(0,0)}
+    hdr();
+  };
+  if(last!==null&&last!==target&&!matchMedia('(prefers-reduced-motion:reduce)').matches){const sw=document.getElementById('sweep');sw.classList.remove('run');void sw.offsetWidth;sw.classList.add('run');setTimeout(go,450)}else go();
+  last=target;
+}
+addEventListener('hashchange',route);
+
+/* nyitány: videó vagy diavetítés */
+const HERO_VIDEO=(matchMedia('(max-width:900px)').matches||navigator.connection?.saveData)?'video/ja111_720.mp4':'video/ja111_1080.mp4';
+const SLIDES=[['render.jpg','Madártávlat'],['homlokzat.jpg','Kerti homlokzat'],['terasz.jpg','D lakóegység terasza'],['erkezes.jpg','Érkezés']];
+const media=document.getElementById('media');
+const RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+if(HERO_VIDEO){
+  media.innerHTML=`<video id="hv" src="${HERO_VIDEO}" ${RM?'':'autoplay'} muted loop playsinline preload="auto" poster="img/video_poster.jpg" aria-label="JA111 bemutatófilm"></video>`;
+  const hv=document.getElementById('hv'),pb=document.getElementById('vplay');
+  const sync=()=>{pb.setAttribute('aria-label',hv.paused?'Film lejátszása':'Film szüneteltetése');pb.innerHTML=hv.paused?'<svg width="12" height="14" viewBox="0 0 12 14"><path d="M1 1l10 6-10 6z" fill="currentColor"/></svg>':'<svg width="12" height="14" viewBox="0 0 12 14"><path d="M2 1v12M10 1v12" stroke="currentColor" stroke-width="2.4"/></svg>'};
+  hv.addEventListener('play',sync);hv.addEventListener('pause',sync);sync();
+  pb.addEventListener('click',()=>{hv.paused?hv.play().catch(()=>{}):hv.pause()});
+  hv.addEventListener('error',()=>{media.innerHTML=`<img src="img/render.jpg" class="act" alt="">`});
+  new IntersectionObserver(es=>{const v=es[0].isIntersecting;if(!v&&!hv.paused){hv.pause();hv.dataset.auto=1}else if(v&&hv.dataset.auto){hv.play().catch(()=>{});delete hv.dataset.auto}}).observe(document.getElementById('top'));
+}
+else{
+  media.innerHTML=SLIDES.map((x,i)=>`<img src="img/${x[0]}" alt="${x[1]}" class="${i?'':'act'}">`).join('');
+  let si=0;const im=media.querySelectorAll('img');
+  if(!matchMedia('(prefers-reduced-motion:reduce)').matches)setInterval(()=>{if(document.hidden)return;im[si].classList.remove('act');si=(si+1)%im.length;void im[si].offsetWidth;im[si].classList.add('act')},6500);
+}
+
+/* galéria */
+const G=[['render.jpg','Madártávlat – négy lakóegység a fák között'],['homlokzat.jpg','Kerti homlokzat, nagy üvegfelületekkel'],['etkezo.jpg','Étkező és áttört lépcső'],['terasz.jpg','A D lakóegység terasza pezsgőfürdővel'],['nappali.jpg','Nappali, háttérben a konyha'],['erkezes.jpg','Bejárat és garázs'],['zsaluzia.jpg','Leeresztett zsaluziák']];
+const track=document.getElementById('track');
+track.innerHTML=G.map((g,i)=>`<figure data-i="${i}"><img src="img/${g[0]}" alt="${g[1]}" loading="lazy"><figcaption>${String(i+1).padStart(2,'0')} · ${g[1]}</figcaption></figure>`).join('');
+track.addEventListener('click',e=>{const f=e.target.closest('figure');if(!f)return;const lb=document.getElementById('lb'),img=lb.querySelector('img');img.src=f.querySelector('img').src;img.alt=f.querySelector('img').alt;lb.classList.add('show')});
+
+/* zsaluzia */
+const bl=document.getElementById('blinds'),bi=document.getElementById('bl'),bo=document.getElementById('blo');
+const setB=v=>{bl.style.setProperty('--v',v);bi.value=v;bo.textContent=Math.round(v)+'%'};
+bi.addEventListener('input',()=>{auto=false;setB(+bi.value)});
+let auto=true;
+new IntersectionObserver((es,o)=>{if(!es[0].isIntersecting)return;o.disconnect();
+  const t0=performance.now();const st=n=>{if(!auto)return;const t=(n-t0)/1000;const v=t<2.4?100*easeIO(t/2.4):t<3.6?100:t<6?100*(1-easeIO((t-3.6)/2.4)):0;setB(v);if(t<6)requestAnimationFrame(st)};
+  setTimeout(()=>requestAnimationFrame(st),500)},{threshold:.5}).observe(bl);
+function easeIO(x){return x<.5?2*x*x:1-((-2*x+2)**2)/2}
+
+/* koncepció bejárás */
+{const cp=document.getElementById('cplan'),cv=document.getElementById('cv'),steps=[...document.querySelectorAll('.cstep')],dots=document.getElementById('cdots'),lg=document.getElementById('clegend');
+ const LG=['Helyszínrajz','Bekötőút az utcától','Vendégparkoló','A–D lakóegységek','Saját kertek','Tájolás'];
+ dots.innerHTML=steps.map(()=>'<i></i>').join('');
+ let ck=-1;
+ function place(k){const st=steps[k],[fx,fy]=st.dataset.f.split(',').map(Number),S=+st.dataset.s;
+   const bw=cp.clientWidth,bh=cp.clientHeight,cw=cv.offsetWidth,ch=cv.offsetHeight;
+   let tx=bw/2-fx/1800*cw*S,ty=bh/2-fy/1013*ch*S;
+   tx=Math.min(0,Math.max(bw-cw*S,tx));ty=Math.min(0,Math.max(bh-ch*S,ty));
+   cv.style.transform=`translate(${tx}px,${ty}px) scale(${S})`}
+ function set(k){if(k===ck)return;ck=k;cp.dataset.k=k;steps.forEach((s,i)=>s.classList.toggle('on',i===k));
+   dots.querySelectorAll('i').forEach((d,i)=>d.classList.toggle('on',i<=k));lg.textContent=LG[k];place(k)}
+ const o=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)set(+e.target.dataset.k)}),{rootMargin:'-45% 0px -45% 0px'});
+ steps.forEach(s=>o.observe(s));addEventListener('resize',()=>{const k=ck;ck=-1;set(Math.max(0,k))});set(0)}
+/* görgetésvezérelt animációk */
+const intro=document.getElementById('top'),ticks=intro.querySelectorAll('.ticks i'),lns=[...intro.querySelectorAll('[data-t]')],hg=document.getElementById('galeria'),gc=document.getElementById('gcount');
+const H1=document.getElementById('hdr');
+const narrow=matchMedia('(max-width:700px)');
+function frame(){
+  const vh=innerHeight;
+  if(!document.body.classList.contains('unit')){
+    const r=intro.getBoundingClientRect(),p=Math.min(1,Math.max(0,-r.top/(r.height-vh)));
+    intro.style.setProperty('--p',p.toFixed(4));
+    intro.classList.toggle('go',p>.04);intro.classList.toggle('done',p>.7);
+    lns.forEach(l=>l.classList.toggle('on',p>=+l.dataset.t));
+    ticks.forEach((t,i)=>t.classList.toggle('on',p>=[0,.08,.24,.4,.72][i]));
+    H1.classList.toggle('solid',r.bottom<70);
+    if(!narrow.matches){const g=hg.getBoundingClientRect(),gp=Math.min(1,Math.max(0,-g.top/(g.height-vh)));
+      const max=track.scrollWidth-track.clientWidth;track.style.transform=`translateX(${-gp*Math.max(0,track.scrollWidth-innerWidth)}px)`;
+      gc.textContent=String(Math.min(G.length,1+Math.floor(gp*G.length*.999))).padStart(2,'0')+' / '+String(G.length).padStart(2,'0')}
+  }else H1.classList.toggle('solid',scrollY>innerHeight*.6);
+  document.querySelectorAll('.px').forEach(im=>{const b=im.parentElement.getBoundingClientRect();if(b.bottom<0||b.top>vh)return;const c=(b.top+b.height/2-vh/2)/vh;im.style.setProperty('--py',(c*-40).toFixed(1)+'px')});
+}
+let tk=false;addEventListener('scroll',()=>{if(!tk){tk=true;requestAnimationFrame(()=>{frame();tk=false})}},{passive:true});
+addEventListener('resize',frame);
+function hdr(){frame()}
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+function reveal(){document.querySelectorAll('.rv:not(.in)').forEach(e=>io.observe(e))}
+reveal();route();hdr();
+}
+</script>
+</body>
+</html>
